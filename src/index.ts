@@ -1,7 +1,6 @@
 import TodoItem from "./domain/todoItem.js";
-import {TodoCollection} from "./domain/todoCollection.js";
 import inquirer from "inquirer";
-import prompt = inquirer.prompt;
+import {JsonTodoCollection} from "./domain/jsonTodoCollection.js";
 
 let todos = [
     new TodoItem(1, "Buy Flowers"),
@@ -10,29 +9,31 @@ let todos = [
     new TodoItem(4, "Call Joe", true),
 ]
 
-let collection = new TodoCollection("Adam", todos)
+let collection = new JsonTodoCollection("Adam", todos)
 let showCompleted = true;
+
 function displayTodoList(): void {
     console.log(`${collection.userName}'s Todo List `
-        + `(${ collection.getItemCounts().incomplete } items to do)`);
+        + `(${collection.getItemCounts().incomplete} items to do)`);
     collection.getTodoItems(showCompleted).forEach(item => item.printDetails());
 }
 
 console.clear()
 console.log(`${collection.userName}'s Todo List `
-    + `(${ collection.getItemCounts().incomplete } items to do)`);
+    + `(${collection.getItemCounts().incomplete} items to do)`);
 
 enum Commands {
-    Add="Add New Task",
-    Complete="Complete Task",
-    Toggle="Show/Hide Complete",
-    Purge="Remove Completed Tasks",
+    Add = "Add New Task",
+    Complete = "Complete Task",
+    Toggle = "Show/Hide Complete",
+    Purge = "Remove Completed Tasks",
     Quit = "Quit"
 }
 
 function promptComplete(): void {
     console.clear();
-    inquirer.prompt({ type: "checkbox", name: "complete",
+    inquirer.prompt({
+        type: "checkbox", name: "complete",
         message: "Mark Tasks Complete",
         choices: collection.getTodoItems(showCompleted).map(item =>
             ({name: item.task, value: item.id, checked: item.complete}))
@@ -47,10 +48,11 @@ function promptComplete(): void {
 
 function promptAdd(): void {
     console.clear();
-    inquirer.prompt({ type: "input", name: "add", message: "Enter task:"})
-        .then(answers => {if (answers["add"] !== "") {
-            collection.addTodo(answers["add"]);
-        }
+    inquirer.prompt({type: "input", name: "add", message: "Enter task:"})
+        .then(answers => {
+            if (answers["add"] !== "") {
+                collection.addTodo(answers["add"]);
+            }
             promptUser();
         })
 }
